@@ -1,5 +1,28 @@
 import SwiftUI
 import AppKit
+import UniformTypeIdentifiers
+
+// Custom UTIs registered in Info.plist's UTExportedTypeDeclarations.
+// Used to differentiate folder-reorder drags from note drags so the drop
+// target can give distinct visuals and behaviour per drag kind.
+extension UTType {
+    static let mynahFolderRef = UTType(exportedAs: "com.mynahpad.folder-ref")
+    static let mynahNoteRef = UTType(exportedAs: "com.mynahpad.note-ref")
+}
+
+struct FolderRef: Codable, Transferable {
+    let id: String
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .mynahFolderRef)
+    }
+}
+
+struct NoteRef: Codable, Transferable {
+    let id: String
+    static var transferRepresentation: some TransferRepresentation {
+        CodableRepresentation(contentType: .mynahNoteRef)
+    }
+}
 
 /// Root SwiftUI view shown inside NoteListWindow.
 ///
@@ -23,6 +46,7 @@ struct NoteListView: View {
     @State private var moveTargetNoteID: String? = nil
     @State private var showMoveSheet: Bool = false
     @State private var dropTargetFolderID: String? = nil
+    @State private var folderReorderTargetID: String? = nil
     @State private var dropTargetNoteID: String? = nil
     /// Which folders show their notes inline in stacked layout.
     @State private var expandedFolderIDs: Set<String> = []
@@ -169,19 +193,42 @@ struct NoteListView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .draggable("folder:\(folder.id)") {
-            Text(folder.name)
-                .font(.system(size: 12, weight: .semibold))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .foregroundColor(.white)
-                .background(
-                    RoundedRectangle(cornerRadius: 6)
-                        .fill(Color.accentColor.opacity(0.9))
-                )
+        .overlay(alignment: .top) {
+            if folderReorderTargetID == folder.id {
+                Rectangle()
+                    .fill(Color.accentColor)
+                    .frame(height: 2)
+                    .padding(.horizontal, 8)
+            }
         }
-        .dropDestination(for: String.self) { ids, _ in
-            handleDroppedPayloads(ids, on: folder.id)
+        .draggable(FolderRef(id: folder.id)) {
+            HStack(spacing: 6) {
+                Image(systemName: "folder.fill")
+                Text(folder.name)
+                    .font(.system(size: 12, weight: .semibold))
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .foregroundColor(.white)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color.accentColor.opacity(0.9))
+            )
+        }
+        .dropDestination(for: FolderRef.self) { refs, _ in
+            for ref in refs where ref.id != folder.id {
+                store.moveFolder(id: ref.id, before: folder.id)
+            }
+            return true
+        } isTargeted: { active in
+            folderReorderTargetID = active ? folder.id : nil
+        }
+        .dropDestination(for: NoteRef.self) { refs, _ in
+            for ref in refs {
+                store.moveNote(id: ref.id, toFolder: folder.id)
+            }
+            expandedFolderIDs.insert(folder.id)
+            setFolder(folder.id)
             return true
         } isTargeted: { active in
             dropTargetFolderID = active ? folder.id : nil
@@ -274,19 +321,42 @@ struct NoteListView: View {
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .draggable("folder:\(folder.id)") {
-                Text(folder.name)
-                    .font(.system(size: 13, weight: .semibold))
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .foregroundColor(.white)
-                    .background(
-                        RoundedRectangle(cornerRadius: 6)
-                            .fill(Color.accentColor.opacity(0.9))
-                    )
+            .overlay(alignment: .top) {
+                if folderReorderTargetID == folder.id {
+                    Rectangle()
+                        .fill(Color.accentColor)
+                        .frame(height: 2)
+                        .padding(.horizontal, 8)
+                }
             }
-            .dropDestination(for: String.self) { ids, _ in
-                handleDroppedPayloads(ids, on: folder.id)
+            .draggable(FolderRef(id: folder.id)) {
+                HStack(spacing: 6) {
+                    Image(systemName: "folder.fill")
+                    Text(folder.name)
+                        .font(.system(size: 13, weight: .semibold))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .foregroundColor(.white)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(Color.accentColor.opacity(0.9))
+                )
+            }
+            .dropDestination(for: FolderRef.self) { refs, _ in
+                for ref in refs where ref.id != folder.id {
+                    store.moveFolder(id: ref.id, before: folder.id)
+                }
+                return true
+            } isTargeted: { active in
+                folderReorderTargetID = active ? folder.id : nil
+            }
+            .dropDestination(for: NoteRef.self) { refs, _ in
+                for ref in refs {
+                    store.moveNote(id: ref.id, toFolder: folder.id)
+                }
+                expandedFolderIDs.insert(folder.id)
+                setFolder(folder.id)
                 return true
             } isTargeted: { active in
                 dropTargetFolderID = active ? folder.id : nil
@@ -378,7 +448,7 @@ struct NoteListView: View {
             viewState.selectedNoteID = note.id
             inputFocused = false
         }
-        .draggable(note.id) {
+        .draggable(NoteRef(id: note.id)) {
             Text(truncated)
                 .font(.system(size: 12))
                 .padding(.horizontal, 10)
@@ -389,8 +459,10 @@ struct NoteListView: View {
                         .fill(Color.accentColor.opacity(0.9))
                 )
         }
-        .dropDestination(for: String.self) { payloads, _ in
-            handleDroppedOnNote(payloads, target: note)
+        .dropDestination(for: NoteRef.self) { refs, _ in
+            for ref in refs where ref.id != note.id {
+                store.moveNote(id: ref.id, before: note.id, in: note.folder_id)
+            }
             return true
         } isTargeted: { active in
             dropTargetNoteID = active ? note.id : nil
@@ -548,29 +620,6 @@ struct NoteListView: View {
         return Color.clear
     }
 
-    private func handleDroppedPayloads(_ payloads: [String], on folderID: String) {
-        for payload in payloads {
-            if payload.hasPrefix("folder:") {
-                let draggedID = String(payload.dropFirst("folder:".count))
-                if draggedID != folderID {
-                    store.moveFolder(id: draggedID, before: folderID)
-                }
-            } else {
-                store.moveNote(id: payload, toFolder: folderID)
-                expandedFolderIDs.insert(folderID)
-                setFolder(folderID)
-            }
-        }
-    }
-
-    private func handleDroppedOnNote(_ payloads: [String], target: Note) {
-        for payload in payloads {
-            // Folder dropped on a note: ignore — folders only reorder among folders.
-            if payload.hasPrefix("folder:") { continue }
-            if payload == target.id { continue }
-            store.moveNote(id: payload, before: target.id, in: target.folder_id)
-        }
-    }
 
     private func openAddFolder() {
         showAddFolder = true
