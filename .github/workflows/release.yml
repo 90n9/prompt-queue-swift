@@ -110,8 +110,10 @@ jobs:
           import re, os
 
           changelog = open("CHANGELOG.md").read()
-          # Grab the first ## [x.x.x] or ## [Unreleased] section
-          m = re.search(r'(## \[.*?\].*?)(?=\n## \[|\Z)', changelog, re.DOTALL)
+          # Grab the first versioned ## [x.y.z] section. Skip the [Unreleased]
+          # header so a tagged release doesn't ship empty notes when the
+          # maintainer left an empty [Unreleased] above the version heading.
+          m = re.search(r'(## \[\d[^\]]*\].*?)(?=\n## \[|\Z)', changelog, re.DOTALL)
           body = m.group(1).strip() if m else "Release"
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write("body<<EOF\n")

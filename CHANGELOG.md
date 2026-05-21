@@ -7,17 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-05-21
+
+First public release. DMG attached to this GitHub Release.
+
 ### Added
 - Initial Swift/SwiftUI rewrite of MynahPad macOS menu-bar app (formerly PromptQueue)
-- NSStatusItem menu bar icon with update check support
-- Floating, frameless dark note list window
-- Folder management and note CRUD operations
-- Double-click to paste note into last focused app via CGEvent Cmd+V
-- FocusTracker to remember the last active non-MynahPad application
-- UpdateChecker fetching latest release from GitHub API
+- NSStatusItem menu bar icon with menu (Show/Hide Window, Check for Updates…, About, Quit)
+- Floating, frameless dark note list window with Spotlight-style vibrancy blur
+- Folder management and note CRUD operations; right-click context menus for both
+- Double-click a note to paste it into the last focused app via CGEvent Cmd+V
+- FocusTracker remembers the last active non-MynahPad application
+- Sparkle 2.6.4 auto-updater — daily background check + "Check for Updates…" menu
+  item; EdDSA signature verification of every downloaded DMG
+- Drag-and-drop sorting for folders and notes via typed Transferable payloads
+  (custom UTIs `com.mynahpad.folder-ref` / `com.mynahpad.note-ref`)
 - JSON storage at `~/.config/mynahpad/notes.json` with auto-migration from the
   legacy `~/.config/promptqueue/notes.json` path (cross-app compatible schema)
-- GitHub Actions release workflow building unsigned .app DMG on `v*.*.*` tags
+- `build.sh` — CLT-only build (no Xcode project), downloads Sparkle on first
+  build, generates a self-signed `MynahPad Dev` cert for TCC-stable rebuilds
+- GitHub Actions release workflow: signs the DMG with Sparkle EdDSA, patches
+  `appcast.xml` on `main`, and publishes the GitHub Release on `v*.*.*` tag push
 
 ### Changed
 - Replaced the placeholder `UpdateChecker` (which only opened the GitHub
@@ -55,7 +65,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Used-note indicator collapsed to the green `checkmark.circle.fill` icon only;
   the redundant `"✓ "` text prefix was removed.
 
-### Known Issues / TODO
-- The release workflow uses `method: development` in ExportOptions.plist. For unsigned
-  macOS archives the correct method is `mac-application`. Update once code signing
-  strategy is decided (ad-hoc, Developer ID, or unsigned direct copy).
+### Known Issues
+- The DMG is signed only by the local self-signed `MynahPad Dev` cert (not an
+  Apple Developer ID). On first launch macOS Gatekeeper will warn; right-click
+  the app → Open → Open to bypass once. Updates after the first launch flow
+  through Sparkle's signed channel and don't re-prompt.
