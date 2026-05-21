@@ -74,6 +74,7 @@ Icon?
 .claude/settings.local.json
 .claude/local/
 .mcp.json
+.playwright-mcp/
 
 # Node (in case scripts pull anything in)
 node_modules/

@@ -131,7 +131,22 @@ final class StatusBarController: NSObject {
 
     @objc private func showAbout() {
         NSApp.activate(ignoringOtherApps: true)
-        NSApp.orderFrontStandardAboutPanel(nil)
+
+        let tagline = "A lightweight macOS menu-bar app that pastes text prompts into your terminal with a double-click."
+        let credits = NSAttributedString(
+            string: tagline,
+            attributes: [
+                .font: NSFont.systemFont(ofSize: NSFont.smallSystemFontSize),
+                .foregroundColor: NSColor.secondaryLabelColor,
+                .paragraphStyle: {
+                    let style = NSMutableParagraphStyle()
+                    style.alignment = .center
+                    return style
+                }(),
+            ]
+        )
+
+        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
     }
 
     @objc private func checkForUpdates(_ sender: Any?) {

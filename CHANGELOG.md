@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-05-21
+
+### Changed
+- About panel now includes a one-line tagline ("A lightweight macOS menu-bar
+  app that pastes text prompts into your terminal with a double-click.")
+  rendered as centered secondary text via the standard
+  `NSAboutPanelOptionKey.credits` attributed-string slot, so the About window
+  explains what the app does instead of showing the bare bundle name.
+
+### Build
+- Ignore `.playwright-mcp/` working directory so Playwright MCP scratch state
+  no longer shows up as untracked noise in `git status`.
+
 ## [1.0.1] - 2026-05-21
 
 ### Fixed
