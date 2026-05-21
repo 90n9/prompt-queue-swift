@@ -54,6 +54,7 @@ else
 fi
 
 echo "→ Compiling Swift sources..."
+mkdir -p "$DIST"
 swiftc \
   -sdk "$SDK" \
   -target arm64-apple-macosx13.0 \
