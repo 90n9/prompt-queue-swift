@@ -18,6 +18,7 @@ struct NoteListView: View {
     @State private var showAddFolder: Bool = false
     @State private var moveTargetNoteID: String? = nil
     @State private var showMoveSheet: Bool = false
+    @FocusState private var inputFocused: Bool
 
     // Convenience alias wired to viewState so the window can read/write it.
     private var selectedNoteID: Binding<String?> {
@@ -42,8 +43,12 @@ struct NoteListView: View {
         .sheet(isPresented: $showMoveSheet) {
             moveSheet
         }
-        // Esc / Delete keyboard handling is delegated to NoteListWindow.keyDown(with:)
-        // because .onKeyPress requires macOS 14+. See NoteListWindow for implementation.
+        .onAppear {
+            // Auto-focus the input field so the user can type immediately.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                inputFocused = true
+            }
+        }
     }
 
     // MARK: - Title bar
@@ -141,24 +146,27 @@ struct NoteListView: View {
 
     private var noteList: some View {
         let visibleNotes = store.notes.filter { $0.folder_id == selectedFolderID }
-        return List(selection: selectedNoteID) {
-            if visibleNotes.isEmpty {
-                Text("No notes yet — add one below")
-                    .font(.system(size: 12))
-                    .foregroundColor(.white.opacity(0.35))
-                    .listRowBackground(Color.clear)
-            } else {
-                ForEach(visibleNotes) { note in
-                    noteRow(note)
-                        .listRowBackground(Color.clear)
-                        .listRowInsets(EdgeInsets(top: 3, leading: 10, bottom: 3, trailing: 10))
+        // Use ScrollView+LazyVStack instead of List so we control the background
+        // on macOS 12 (List's background can't be cleared without scrollContentBackground,
+        // which requires macOS 13+).
+        return ScrollView {
+            LazyVStack(spacing: 0) {
+                if visibleNotes.isEmpty {
+                    Text("No notes yet — add one below")
+                        .font(.system(size: 12))
+                        .foregroundColor(.white.opacity(0.35))
+                        .padding(.top, 24)
+                } else {
+                    ForEach(visibleNotes) { note in
+                        noteRow(note)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                    }
                 }
             }
+            .padding(.vertical, 4)
         }
-        .listStyle(.plain)
-        // scrollContentBackground(.hidden) requires macOS 13+; use listRowBackground
-        // on each row to achieve a transparent List on macOS 12.
-        .background(Color.clear)
+        .background(Color(red: 0.102, green: 0.102, blue: 0.102))
     }
 
     @ViewBuilder
@@ -209,6 +217,7 @@ struct NoteListView: View {
                 .padding(.vertical, 8)
                 .background(Color.white.opacity(0.07))
                 .cornerRadius(6)
+                .focused($inputFocused)
                 .onSubmit { addNote() }
 
             Button(action: addNote) {
