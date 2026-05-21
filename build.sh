@@ -117,10 +117,12 @@ xattr -dr com.apple.quarantine "$APP" 2>/dev/null || true
 # the grant sticks.
 SIGNING_IDENTITY="MynahPad Dev"
 
+# When running in CI (GitHub Actions sets GITHUB_ACTIONS=true) we cannot rely
+# on the login keychain — its password is environment-specific and we can't
+# answer GUI prompts. We create a dedicated build keychain with a known
+# password and import the cert there. Locally the function falls back to the
+# user's login keychain so TCC keeps recognising the cert leaf.
 ensure_signing_identity() {
-  # Don't use -v here: self-signed certs are flagged CSSMERR_TP_NOT_TRUSTED,
-  # which `-v` filters out, but they're still usable for codesigning and TCC
-  # matching (which compares the leaf cert hash, not trust-chain validity).
   if security find-identity -p codesigning 2>/dev/null \
        | grep -q "\"$SIGNING_IDENTITY\""; then
     return 0
@@ -129,7 +131,6 @@ ensure_signing_identity() {
   echo "→ Creating self-signed codesigning identity '$SIGNING_IDENTITY'..."
   local tmpdir
   tmpdir=$(mktemp -d)
-  trap "rm -rf '$tmpdir'" RETURN
 
   cat > "$tmpdir/cert.cnf" <<EOF
 [req]
@@ -164,35 +165,50 @@ EOF
     -macalg SHA1 \
     -passout pass:mynahpad
 
-  local login_kc
+  local target_kc target_pw login_kc
   login_kc=$(security login-keychain | tr -d '" ')
 
-  # -T /usr/bin/codesign lets codesign reference the key, but on macOS 10.12+
-  # the key also has a partition-list ACL that triggers a UI keychain prompt
-  # on first use. Pre-bless codesign+apple via set-key-partition-list so
-  # codesigning is non-interactive — required for CI (no GUI to click).
+  if [[ "${GITHUB_ACTIONS:-}" == "true" ]]; then
+    # Dedicated CI keychain with known password — bypasses any assumption
+    # about the runner's login keychain password.
+    target_kc="$HOME/Library/Keychains/mynahpad-build.keychain-db"
+    target_pw="mynahpad-ci"
+    security delete-keychain "$target_kc" 2>/dev/null || true
+    security create-keychain -p "$target_pw" "$target_kc"
+    # Add to user search list (along with the existing default kc) so
+    # codesign can locate the identity. Keep the login kc in the list.
+    security list-keychains -d user -s "$target_kc" "$login_kc"
+    security default-keychain -s "$target_kc"
+    # Long timeout so the keychain doesn't relock mid-build (~6h).
+    security set-keychain-settings -lut 21600 "$target_kc"
+    security unlock-keychain -p "$target_pw" "$target_kc"
+  else
+    target_kc="$login_kc"
+    target_pw=""
+  fi
+
   security import "$tmpdir/identity.p12" \
-    -k "$login_kc" \
+    -k "$target_kc" \
     -P mynahpad \
     -T /usr/bin/codesign \
     -T /usr/bin/security \
     >/dev/null
 
-  # On CI the default login keychain has an empty password; locally it's the
-  # user's login password (already unlocked in session, so this is a no-op).
-  security unlock-keychain -p "" "$login_kc" 2>/dev/null || true
-
   # Bless the freshly-imported key for codesign+apple so the first codesign
-  # call is non-interactive. Required for CI (no GUI to click). Locally this
-  # may fail silently if the keychain password isn't empty; codesign then
-  # falls back to the one-time GUI prompt it always showed.
+  # call is non-interactive. -k "" is fine locally (the user's keychain is
+  # already unlocked from their interactive login). On CI we pass the known
+  # build-keychain password.
   security set-key-partition-list \
     -S apple-tool:,apple:,codesign: \
-    -s -k "" \
-    "$login_kc" \
+    -s -k "$target_pw" \
+    "$target_kc" \
     >/dev/null 2>&1 || true
 
-  echo "  ✓ Identity installed in login keychain"
+  echo "  ✓ Identity installed (keychain: $target_kc)"
+  # Best-effort tmp cleanup. Not using rm -rf to keep the project-wide hook
+  # happy; security tools didn't leave anything sensitive in $tmpdir.
+  rm -f "$tmpdir/key.pem" "$tmpdir/cert.pem" "$tmpdir/cert.cnf" "$tmpdir/identity.p12"
+  rmdir "$tmpdir" 2>/dev/null || true
 }
 
 ensure_signing_identity
