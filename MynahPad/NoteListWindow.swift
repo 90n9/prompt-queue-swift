@@ -8,6 +8,9 @@ import SwiftUI
 /// without using `.onKeyPress` (macOS 14+).
 final class NoteListViewState: ObservableObject {
     @Published var selectedNoteID: String? = nil
+    /// Mirrors the visible folder so the window's keyDown can read it
+    /// (for "Cmd+Delete clears used in current folder", etc.).
+    @Published var selectedFolderID: String = "general"
 }
 
 // MARK: - Window
@@ -64,17 +67,19 @@ final class NoteListWindow: NSWindow, NSWindowDelegate {
     // MARK: - Configuration
 
     private func configureWindow() {
-        // Appearance — use a fully opaque background colour + window alphaValue for
-        // transparency. Setting both alpha in the colour AND alphaValue compounds
-        // them (~0.92 effective), so we keep the colour opaque.
-        backgroundColor = NSColor(calibratedRed: 0.102, green: 0.102, blue: 0.102, alpha: 1.0)
+        // Window itself is clear — NSVisualEffectView (added in embedSwiftUI)
+        // provides the Spotlight-style desktop blur.
+        backgroundColor = .clear
         isOpaque = false
-        alphaValue = 0.96
         hasShadow = true
 
-        // Corner radius via contentView layer
+        // Force dark appearance so the dark vibrancy material is used and
+        // text remains light regardless of the system setting.
+        appearance = NSAppearance(named: .darkAqua)
+
+        // Corner radius via contentView layer — clips the vibrancy view too.
         contentView?.wantsLayer = true
-        contentView?.layer?.cornerRadius = 10
+        contentView?.layer?.cornerRadius = 12
         contentView?.layer?.masksToBounds = true
 
         // Floating above regular windows, visible on all spaces
@@ -83,8 +88,10 @@ final class NoteListWindow: NSWindow, NSWindowDelegate {
 
         // Allow resizing
         minSize = NSSize(width: 280, height: 350)
-        maxSize = NSSize(width: 600, height: 900)
+        maxSize = NSSize(width: 1100, height: 1200)
 
+        // Window drags from any background region. Note rows opt out of this
+        // via NoWindowDragRegion so .draggable doesn't compete with the move.
         isMovableByWindowBackground = true
         titlebarAppearsTransparent = true
         titleVisibility = .hidden
@@ -95,35 +102,77 @@ final class NoteListWindow: NSWindow, NSWindowDelegate {
 
     // MARK: - Keyboard
 
+    // Borderless windows return false for canBecomeKey by default, which blocks
+    // keyboard input to embedded text fields. Override so the input bar can type.
+    override var canBecomeKey: Bool { true }
+    override var canBecomeMain: Bool { true }
+
     override func keyDown(with event: NSEvent) {
         switch event.keyCode {
         case 53:  // Esc
             hideWindow()
+            return
         case 51, 117:  // Delete (backspace=51) / Forward-Delete (117)
+            if event.modifierFlags.contains(.command) {
+                // Cmd+Delete: clear all used notes in the current folder.
+                store.deleteUsedNotes(in: viewState.selectedFolderID)
+                return
+            }
             if let noteID = viewState.selectedNoteID {
                 store.deleteNote(id: noteID)
                 viewState.selectedNoteID = nil
+                return
             }
         default:
-            super.keyDown(with: event)
+            // Digits 1–9 move the selected note to folder N (1-indexed).
+            if event.modifierFlags.intersection([.command, .option, .control]).isEmpty,
+               let chars = event.charactersIgnoringModifiers,
+               let digit = Int(chars), (1...9).contains(digit),
+               let noteID = viewState.selectedNoteID,
+               digit <= store.folders.count {
+                let target = store.folders[digit - 1]
+                store.moveNote(id: noteID, toFolder: target.id)
+                viewState.selectedFolderID = target.id
+                return
+            }
         }
+        super.keyDown(with: event)
     }
 
     private func embedSwiftUI() {
+        guard let cv = contentView else { return }
+
+        // Vibrancy layer — blurs the desktop behind the window, like Spotlight
+        // and Notification Center. `.hudWindow` gives the dark, slightly tinted
+        // material; `.behindWindow` blends with what's behind the app window.
+        let blur = NSVisualEffectView()
+        blur.material = .hudWindow
+        blur.blendingMode = .behindWindow
+        blur.state = .active
+        blur.translatesAutoresizingMaskIntoConstraints = false
+        cv.addSubview(blur)
+
         let rootView = NoteListView(store: store, focusTracker: focusTracker, viewState: viewState) { [weak self] in
             self?.hideWindow()
         }
         let hosting = NSHostingView(rootView: rootView)
         hosting.translatesAutoresizingMaskIntoConstraints = false
-        contentView?.addSubview(hosting)
-        if let cv = contentView {
-            NSLayoutConstraint.activate([
-                hosting.topAnchor.constraint(equalTo: cv.topAnchor),
-                hosting.leadingAnchor.constraint(equalTo: cv.leadingAnchor),
-                hosting.trailingAnchor.constraint(equalTo: cv.trailingAnchor),
-                hosting.bottomAnchor.constraint(equalTo: cv.bottomAnchor),
-            ])
-        }
+        // Ensure the SwiftUI host doesn't paint a solid background that would
+        // block the vibrancy layer below it.
+        hosting.wantsLayer = true
+        hosting.layer?.backgroundColor = NSColor.clear.cgColor
+        cv.addSubview(hosting)
+
+        NSLayoutConstraint.activate([
+            blur.topAnchor.constraint(equalTo: cv.topAnchor),
+            blur.leadingAnchor.constraint(equalTo: cv.leadingAnchor),
+            blur.trailingAnchor.constraint(equalTo: cv.trailingAnchor),
+            blur.bottomAnchor.constraint(equalTo: cv.bottomAnchor),
+            hosting.topAnchor.constraint(equalTo: cv.topAnchor),
+            hosting.leadingAnchor.constraint(equalTo: cv.leadingAnchor),
+            hosting.trailingAnchor.constraint(equalTo: cv.trailingAnchor),
+            hosting.bottomAnchor.constraint(equalTo: cv.bottomAnchor),
+        ])
     }
 
     // MARK: - Show / Hide

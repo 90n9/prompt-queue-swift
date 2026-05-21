@@ -22,7 +22,7 @@ private struct StorageDocument: Codable {
 
 // MARK: - Store
 
-/// Observed data store backed by `~/.config/promptqueue/notes.json`.
+/// Observed data store backed by `~/.config/mynahpad/notes.json`.
 /// Uses `ObservableObject` + `@Published` for macOS 12 compatibility
 /// (`@Observable` macro requires macOS 14+).
 final class Store: ObservableObject {
@@ -34,11 +34,21 @@ final class Store: ObservableObject {
     // MARK: File path
 
     private static var storageURL: URL {
-        let base = FileManager.default
-            .homeDirectoryForCurrentUser
-            .appendingPathComponent(".config/promptqueue", isDirectory: true)
+        let home = FileManager.default.homeDirectoryForCurrentUser
+        let base = home.appendingPathComponent(".config/mynahpad", isDirectory: true)
         try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
-        return base.appendingPathComponent("notes.json")
+        let url = base.appendingPathComponent("notes.json")
+
+        // One-shot migration from the pre-rename location.
+        if !FileManager.default.fileExists(atPath: url.path) {
+            let legacy = home
+                .appendingPathComponent(".config/promptqueue", isDirectory: true)
+                .appendingPathComponent("notes.json")
+            if FileManager.default.fileExists(atPath: legacy.path) {
+                try? FileManager.default.copyItem(at: legacy, to: url)
+            }
+        }
+        return url
     }
 
     // MARK: Load
@@ -103,6 +113,11 @@ final class Store: ObservableObject {
         save()
     }
 
+    func deleteUsedNotes(in folderID: String) {
+        notes.removeAll { $0.folder_id == folderID && $0.used }
+        save()
+    }
+
     func markUsed(id: String) {
         guard let idx = notes.firstIndex(where: { $0.id == id }) else { return }
         notes[idx].used = true
@@ -118,6 +133,36 @@ final class Store: ObservableObject {
     func moveNote(id: String, toFolder folderID: String) {
         guard let idx = notes.firstIndex(where: { $0.id == id }) else { return }
         notes[idx].folder_id = folderID
+        save()
+    }
+
+    /// Reorders `folders` so that the folder with `id` lands immediately
+    /// before the folder with `targetID`. If `targetID` is nil, moves to end.
+    func moveFolder(id: String, before targetID: String?) {
+        guard let from = folders.firstIndex(where: { $0.id == id }) else { return }
+        let moved = folders.remove(at: from)
+        if let targetID,
+           let to = folders.firstIndex(where: { $0.id == targetID }) {
+            folders.insert(moved, at: to)
+        } else {
+            folders.append(moved)
+        }
+        save()
+    }
+
+    /// Moves note `id` into `folderID` and places it immediately before the
+    /// note with `targetID`. If `targetID` is nil, places at end of that folder.
+    /// Same-folder calls reorder; cross-folder calls move + insert.
+    func moveNote(id: String, before targetID: String?, in folderID: String) {
+        guard let from = notes.firstIndex(where: { $0.id == id }) else { return }
+        var moved = notes.remove(at: from)
+        moved.folder_id = folderID
+        if let targetID,
+           let to = notes.firstIndex(where: { $0.id == targetID }) {
+            notes.insert(moved, at: to)
+        } else {
+            notes.append(moved)
+        }
         save()
     }
 

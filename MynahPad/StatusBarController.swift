@@ -27,17 +27,27 @@ final class StatusBarController: NSObject {
 
     private func configureButton() {
         guard let button = statusItem.button else { return }
+        button.image = loadMenuBarIcon()
+        button.toolTip = "MynahPad"
+    }
 
-        // SF Symbol template image — scales with menu bar appearance.
-        if let image = NSImage(systemSymbolName: "note.text", accessibilityDescription: "PromptQueue") {
+    /// Prefers the bundled MiniIcon.png (proper template image with the bird
+    /// silhouette). Falls back to an SF Symbol, then to a drawn square — both
+    /// kept so the app still launches if the asset is missing.
+    private func loadMenuBarIcon() -> NSImage {
+        if let url = Bundle.main.url(forResource: "MiniIcon", withExtension: "png"),
+           let image = NSImage(contentsOf: url) {
+            // Point size for menu-bar status items. macOS renders the high-res
+            // bitmap (663x651) downsampled to this size and picks @2x on Retina.
+            image.size = NSSize(width: 18, height: 18)
             image.isTemplate = true
-            button.image = image
-        } else {
-            // Fallback: draw a simple pencil square.
-            button.image = makeFallbackIcon()
+            return image
         }
-
-        button.toolTip = "PromptQueue"
+        if let image = NSImage(systemSymbolName: "note.text", accessibilityDescription: "MynahPad") {
+            image.isTemplate = true
+            return image
+        }
+        return makeFallbackIcon()
     }
 
     private func makeFallbackIcon() -> NSImage {
@@ -60,7 +70,7 @@ final class StatusBarController: NSObject {
 
         // Version label / update item placeholder.
         let versionItem = NSMenuItem(
-            title: "PromptQueue v\(Self.version)",
+            title: "MynahPad v\(Self.version)",
             action: nil,
             keyEquivalent: ""
         )
@@ -82,7 +92,7 @@ final class StatusBarController: NSObject {
         menu.addItem(.separator())
 
         let about = NSMenuItem(
-            title: "About PromptQueue",
+            title: "About MynahPad",
             action: #selector(showAbout),
             keyEquivalent: ""
         )
@@ -133,7 +143,7 @@ final class StatusBarController: NSObject {
     }
 
     @objc private func openReleasePage() {
-        let url = URL(string: "https://github.com/90n9/prompt-queue-swift/releases")!
+        let url = URL(string: "https://github.com/90n9/mynah-pad/releases")!
         NSWorkspace.shared.open(url)
     }
 }

@@ -39,9 +39,9 @@ jobs:
       - name: Archive
         run: |
           xcodebuild \
-            -scheme PromptQueue \
+            -scheme MynahPad \
             -configuration Release \
-            -archivePath build/PromptQueue.xcarchive \
+            -archivePath build/MynahPad.xcarchive \
             archive \
             -allowProvisioningUpdates \
             CODE_SIGN_IDENTITY="" \
@@ -52,7 +52,7 @@ jobs:
         run: |
           xcodebuild \
             -exportArchive \
-            -archivePath build/PromptQueue.xcarchive \
+            -archivePath build/MynahPad.xcarchive \
             -exportPath build/export \
             -exportOptionsPlist ExportOptions.plist
 
@@ -60,10 +60,10 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           APP_PATH="$(find build/export -name '*.app' | head -1)"
-          DMG_NAME="PromptQueue-${VERSION}.dmg"
+          DMG_NAME="MynahPad-${VERSION}.dmg"
 
           hdiutil create \
-            -volname "PromptQueue ${VERSION}" \
+            -volname "MynahPad ${VERSION}" \
             -srcfolder "$APP_PATH" \
             -ov \
             -format UDZO \
@@ -91,7 +91,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: "PromptQueue v${{ env.VERSION }}"
+          name: "MynahPad v${{ env.VERSION }}"
           body: ${{ steps.changelog.outputs.body }}
           files: build/${{ env.DMG_NAME }}
         env:

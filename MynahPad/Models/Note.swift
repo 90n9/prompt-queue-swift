@@ -1,6 +1,6 @@
 import Foundation
 
-/// A single text prompt managed by PromptQueue.
+/// A single text prompt managed by MynahPad.
 /// `id`, `folder_id`, and `created_at` use snake_case keys to match the
 /// cross-app JSON schema produced by the Python version.
 struct Note: Identifiable, Codable, Equatable {

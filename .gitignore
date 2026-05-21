@@ -1,33 +1,79 @@
 # Xcode user data
 *.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
 *.xcworkspace/xcuserdata/
 *.xcworkspace/contents.xcworkspacedata
+*.xcuserstate
+*.xcuserdatad/
 
 # Build artifacts
 build/
 dist/
 DerivedData/
 *.xcarchive
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
+*.app
+*.dSYM
+*.dSYM.zip
+*.ipa
 
 # Swift Package Manager
 .build/
+.swiftpm/
+Package.resolved
 *.resolved
 
 # CocoaPods (not used, but guard)
 Pods/
 
-# Instruments
-*.trace
+# Carthage (not used, but guard)
+Carthage/Build/
+Carthage/Checkouts/
 
-# Editor
+# Instruments / profiling / coverage
+*.trace
+*.xccov
+*.xcresult
+*.gcda
+*.gcno
+*.profraw
+
+# Signing / secrets — never commit
+*.mobileprovision
+*.provisionprofile
+*.cer
+*.p12
+*.pem
+*.key
+ExportOptions.plist
+
+# Logs / crash reports
+*.log
+*.crash
+crashlytics-build.properties
+
+# macOS junk
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# Editors / IDEs
 .idea/
+.vscode/
 *.swp
 *.swo
+*~
 
-# Local env
+# Local env / tooling
 .env
+.env.*
+.claude/settings.local.json
+.claude/local/
+.mcp.json
+
+# Node (in case scripts pull anything in)
+node_modules/

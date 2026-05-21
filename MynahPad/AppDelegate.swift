@@ -1,4 +1,5 @@
 import AppKit
+import ApplicationServices
 
 /// Coordinates all top-level objects. Holds strong references to everything that
 /// NSApplication would otherwise release (status bar, window, trackers).
@@ -34,6 +35,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.async {
                 self?.statusBarController.showUpdateAvailable(version: latestVersion)
             }
+        }
+
+        // Accessibility trust — required for the Cmd+V paste to actually fire.
+        // Without it, CGEventPost silently no-ops. Prompt the user once on launch
+        // so they can grant it in System Settings → Privacy & Security.
+        promptForAccessibilityIfNeeded()
+    }
+
+    private func promptForAccessibilityIfNeeded() {
+        let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
+        let opts = [key: true] as CFDictionary
+        let trusted = AXIsProcessTrustedWithOptions(opts)
+        if !trusted {
+            NSLog("[MynahPad] Accessibility not granted — paste will silently fail until granted.")
         }
     }
 

@@ -8,15 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Initial Swift/SwiftUI rewrite of PromptQueue macOS menu-bar app
+- Initial Swift/SwiftUI rewrite of MynahPad macOS menu-bar app (formerly PromptQueue)
 - NSStatusItem menu bar icon with update check support
 - Floating, frameless dark note list window
 - Folder management and note CRUD operations
 - Double-click to paste note into last focused app via CGEvent Cmd+V
-- FocusTracker to remember the last active non-PromptQueue application
+- FocusTracker to remember the last active non-MynahPad application
 - UpdateChecker fetching latest release from GitHub API
-- JSON storage at `~/.config/promptqueue/notes.json` (cross-app compatible schema)
+- JSON storage at `~/.config/mynahpad/notes.json` with auto-migration from the
+  legacy `~/.config/promptqueue/notes.json` path (cross-app compatible schema)
 - GitHub Actions release workflow building unsigned .app DMG on `v*.*.*` tags
+
+### Changed
+- Renamed from **PromptQueue** to **MynahPad**. Bundle identifier
+  `com.promptqueue.swift` → `com.mynahpad.app`. Signing cert
+  `PromptQueue Dev` → `MynahPad Dev`. Accessibility permission must be re-granted
+  once after the first build under the new identifier.
 
 ### Known Issues / TODO
 - The release workflow uses `method: development` in ExportOptions.plist. For unsigned

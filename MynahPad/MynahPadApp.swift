@@ -5,7 +5,7 @@ import SwiftUI
 /// machinery is present only to satisfy the @main contract; the actual UI is
 /// driven by AppDelegate.
 @main
-struct PromptQueueApp: App {
+struct MynahPadApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     var body: some Scene {

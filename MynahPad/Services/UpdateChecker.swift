@@ -1,13 +1,13 @@
 import Foundation
 
-/// Checks the GitHub Releases API for a newer version of PromptQueue.
+/// Checks the GitHub Releases API for a newer version of MynahPad.
 /// Comparison is purely semver string-based (major.minor.patch integers).
 final class UpdateChecker {
 
     static let shared = UpdateChecker()
     private init() {}
 
-    private let apiURL = URL(string: "https://api.github.com/repos/90n9/prompt-queue-swift/releases/latest")!
+    private let apiURL = URL(string: "https://api.github.com/repos/90n9/mynah-pad/releases/latest")!
 
     /// Fetches the latest release tag and calls `completion` on the main queue
     /// with the version string **only if it is newer** than the running bundle version.

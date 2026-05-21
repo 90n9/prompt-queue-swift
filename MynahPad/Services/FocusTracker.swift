@@ -1,10 +1,10 @@
 import AppKit
 
-/// Tracks the last application that was frontmost before PromptQueue was activated.
+/// Tracks the last application that was frontmost before MynahPad was activated.
 /// Paster uses this to re-focus the target app before simulating Cmd+V.
 final class FocusTracker {
 
-    /// The most recent non-PromptQueue frontmost application.
+    /// The most recent non-MynahPad frontmost application.
     private(set) var lastFocusedApp: NSRunningApplication?
 
     private let ownPID: pid_t = NSRunningApplication.current.processIdentifier

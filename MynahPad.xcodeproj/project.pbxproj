@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		AA000001000000000000001 /* PromptQueueApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000001 /* PromptQueueApp.swift */; };
+		AA000001000000000000001 /* MynahPadApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000001 /* MynahPadApp.swift */; };
 		AA000001000000000000002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000002 /* AppDelegate.swift */; };
 		AA000001000000000000003 /* StatusBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000003 /* StatusBarController.swift */; };
 		AA000001000000000000004 /* NoteListWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000002000000000000004 /* NoteListWindow.swift */; };
@@ -21,7 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		AA000002000000000000001 /* PromptQueueApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptQueueApp.swift; sourceTree = "<group>"; };
+		AA000002000000000000001 /* MynahPadApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MynahPadApp.swift; sourceTree = "<group>"; };
 		AA000002000000000000002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AA000002000000000000003 /* StatusBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarController.swift; sourceTree = "<group>"; };
 		AA000002000000000000004 /* NoteListWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListWindow.swift; sourceTree = "<group>"; };
@@ -33,7 +33,7 @@
 		AA00000200000000000000A /* Paster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Paster.swift; sourceTree = "<group>"; };
 		AA00000200000000000000B /* UpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateChecker.swift; sourceTree = "<group>"; };
 		AA00000200000000000000C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		AA00000200000000000000D /* PromptQueue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PromptQueue.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA00000200000000000000D /* MynahPad.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MynahPad.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,10 +47,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		AA000004000000000000001 /* PromptQueue */ = {
+		AA000004000000000000001 /* MynahPad */ = {
 			isa = PBXGroup;
 			children = (
-				AA000002000000000000001 /* PromptQueueApp.swift */,
+				AA000002000000000000001 /* MynahPadApp.swift */,
 				AA000002000000000000002 /* AppDelegate.swift */,
 				AA000002000000000000003 /* StatusBarController.swift */,
 				AA000002000000000000004 /* NoteListWindow.swift */,
@@ -59,7 +59,7 @@
 				AA000004000000000000003 /* Services */,
 				AA00000200000000000000C /* Info.plist */,
 			);
-			path = PromptQueue;
+			path = MynahPad;
 			sourceTree = "<group>";
 		};
 		AA000004000000000000002 /* Models */ = {
@@ -85,7 +85,7 @@
 		AA000004000000000000004 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				AA00000200000000000000D /* PromptQueue.app */,
+				AA00000200000000000000D /* MynahPad.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -93,7 +93,7 @@
 		AA000004000000000000005 /* Root */ = {
 			isa = PBXGroup;
 			children = (
-				AA000004000000000000001 /* PromptQueue */,
+				AA000004000000000000001 /* MynahPad */,
 				AA000004000000000000004 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -101,9 +101,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		AA000005000000000000001 /* PromptQueue */ = {
+		AA000005000000000000001 /* MynahPad */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = AA000008000000000000002 /* Build configuration list for PBXNativeTarget "PromptQueue" */;
+			buildConfigurationList = AA000008000000000000002 /* Build configuration list for PBXNativeTarget "MynahPad" */;
 			buildPhases = (
 				AA000006000000000000001 /* Sources */,
 				AA000003000000000000001 /* Frameworks */,
@@ -113,9 +113,9 @@
 			);
 			dependencies = (
 			);
-			name = PromptQueue;
-			productName = PromptQueue;
-			productReference = AA00000200000000000000D /* PromptQueue.app */;
+			name = MynahPad;
+			productName = MynahPad;
+			productReference = AA00000200000000000000D /* MynahPad.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -133,7 +133,7 @@
 					};
 				};
 			};
-			buildConfigurationList = AA000008000000000000001 /* Build configuration list for PBXProject "PromptQueue" */;
+			buildConfigurationList = AA000008000000000000001 /* Build configuration list for PBXProject "MynahPad" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -146,7 +146,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				AA000005000000000000001 /* PromptQueue */,
+				AA000005000000000000001 /* MynahPad */,
 			);
 		};
 /* End PBXProject section */
@@ -166,7 +166,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA000001000000000000001 /* PromptQueueApp.swift in Sources */,
+				AA000001000000000000001 /* MynahPadApp.swift in Sources */,
 				AA000001000000000000002 /* AppDelegate.swift in Sources */,
 				AA000001000000000000003 /* StatusBarController.swift in Sources */,
 				AA000001000000000000004 /* NoteListWindow.swift in Sources */,
@@ -302,14 +302,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
-				INFOPLIST_FILE = PromptQueue/Info.plist;
+				INFOPLIST_FILE = MynahPad/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.promptqueue.swift";
-				PRODUCT_NAME = PromptQueue;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mynahpad.app";
+				PRODUCT_NAME = MynahPad;
 				SWIFT_VERSION = 5.9;
 			};
 			name = Debug;
@@ -320,14 +320,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
-				INFOPLIST_FILE = PromptQueue/Info.plist;
+				INFOPLIST_FILE = MynahPad/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.promptqueue.swift";
-				PRODUCT_NAME = PromptQueue;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mynahpad.app";
+				PRODUCT_NAME = MynahPad;
 				SWIFT_VERSION = 5.9;
 			};
 			name = Release;
@@ -335,7 +335,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		AA000008000000000000001 /* Build configuration list for PBXProject "PromptQueue" */ = {
+		AA000008000000000000001 /* Build configuration list for PBXProject "MynahPad" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA00000A000000000000001 /* Debug */,
@@ -344,7 +344,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		AA000008000000000000002 /* Build configuration list for PBXNativeTarget "PromptQueue" */ = {
+		AA000008000000000000002 /* Build configuration list for PBXNativeTarget "MynahPad" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				AA00000B000000000000001 /* Debug */,

@@ -3,13 +3,15 @@
 <plist version="1.0">
 <dict>
     <key>CFBundleIdentifier</key>
-    <string>com.promptqueue.swift</string>
+    <string>com.mynahpad.app</string>
     <key>CFBundleName</key>
-    <string>PromptQueue</string>
+    <string>MynahPad</string>
     <key>CFBundleDisplayName</key>
-    <string>PromptQueue</string>
+    <string>MynahPad</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIconFile</key>
+    <string>Icon</string>
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundlePackageType</key>
@@ -19,11 +21,11 @@
     <key>CFBundleVersion</key>
     <string>1</string>
     <key>LSMinimumSystemVersion</key>
-    <string>12.0</string>
+    <string>13.0</string>
     <key>LSUIElement</key>
     <true/>
     <key>NSAccessibilityUsageDescription</key>
-    <string>PromptQueue needs Accessibility access to paste prompts into your terminal.</string>
+    <string>MynahPad needs Accessibility access to paste prompts into your terminal.</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>NSPrincipalClass</key>
