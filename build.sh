@@ -167,16 +167,32 @@ EOF
   local login_kc
   login_kc=$(security login-keychain | tr -d '" ')
 
-  # -T /usr/bin/codesign lets codesign use the key without a per-build
-  # password prompt.
+  # -T /usr/bin/codesign lets codesign reference the key, but on macOS 10.12+
+  # the key also has a partition-list ACL that triggers a UI keychain prompt
+  # on first use. Pre-bless codesign+apple via set-key-partition-list so
+  # codesigning is non-interactive — required for CI (no GUI to click).
   security import "$tmpdir/identity.p12" \
     -k "$login_kc" \
     -P mynahpad \
     -T /usr/bin/codesign \
+    -T /usr/bin/security \
     >/dev/null
 
+  # On CI the default login keychain has an empty password; locally it's the
+  # user's login password (already unlocked in session, so this is a no-op).
+  security unlock-keychain -p "" "$login_kc" 2>/dev/null || true
+
+  # Bless the freshly-imported key for codesign+apple so the first codesign
+  # call is non-interactive. Required for CI (no GUI to click). Locally this
+  # may fail silently if the keychain password isn't empty; codesign then
+  # falls back to the one-time GUI prompt it always showed.
+  security set-key-partition-list \
+    -S apple-tool:,apple:,codesign: \
+    -s -k "" \
+    "$login_kc" \
+    >/dev/null 2>&1 || true
+
   echo "  ✓ Identity installed in login keychain"
-  echo "  ⚠ First codesign call may show 'Always Allow' prompt — click it once."
 }
 
 ensure_signing_identity
