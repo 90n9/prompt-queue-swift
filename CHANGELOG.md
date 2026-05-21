@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-05-21
+
+### Fixed
+- DMG now ships with an `/Applications` symlink next to `MynahPad.app`, so
+  mounting it shows the familiar drag-to-install layout. Previously the DMG
+  contained only the bundle, leaving users to figure out where to put it.
+
 ## [1.0.0] - 2026-05-21
 
 First public release. DMG attached to this GitHub Release.

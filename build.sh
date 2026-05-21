@@ -252,11 +252,26 @@ codesign -d -r- "$APP" 2>&1 | grep -i "designated" | sed 's/^/  /' || true
 if [[ "${1:-}" == "--dmg" ]] || [[ "${2:-}" == "--dmg" ]]; then
   VERSION=$(defaults read "$APP/Contents/Info" CFBundleShortVersionString 2>/dev/null || echo "0.0.0")
   DMG="$DIST/MynahPad-${VERSION}.dmg"
+  STAGE="$DIST/dmg-stage"
+
+  echo "→ Staging DMG contents at $STAGE..."
+  rm -rf "$STAGE"
+  mkdir -p "$STAGE"
+  # Use ditto (preserves resource forks/xattrs/symlinks correctly) so the
+  # signed bundle copies cleanly.
+  ditto "$APP" "$STAGE/MynahPad.app"
+  # Drag-install hint: an /Applications symlink next to the app gives Finder
+  # the familiar "drag MynahPad onto Applications" layout when mounted.
+  ln -s /Applications "$STAGE/Applications"
+
   echo "→ Creating $DMG..."
-  hdiutil create -volname MynahPad \
-    -srcfolder "$APP" \
+  rm -f "$DMG"
+  hdiutil create -volname "MynahPad ${VERSION}" \
+    -srcfolder "$STAGE" \
     -ov -format UDZO \
     "$DMG"
+
+  rm -rf "$STAGE"
   echo "→ DMG: $DMG"
 fi
 
