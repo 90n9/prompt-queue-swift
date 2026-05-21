@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-05-22
+
+### Changed
+- Updates now install silently in the background instead of prompting. Sparkle
+  still does its daily background check (via `SUEnableAutomaticChecks`), but
+  with the new `SUAutomaticallyUpdate` flag turned on it downloads the new DMG
+  without showing a dialog and swaps the bundle the next time MynahPad quits.
+  The user reopens the app on the new version — no more "Install Update"
+  click, no detour through the GitHub release page. EdDSA signature
+  verification against `SUPublicEDKey` still runs on every download, so this
+  doesn't loosen the security posture.
+
 ## [1.0.2] - 2026-05-21
 
 ### Changed

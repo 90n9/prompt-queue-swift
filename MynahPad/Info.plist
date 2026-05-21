@@ -17,9 +17,9 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
-    <string>1.0.2</string>
+    <string>1.0.3</string>
     <key>CFBundleVersion</key>
-    <string>3</string>
+    <string>4</string>
     <key>LSMinimumSystemVersion</key>
     <string>13.0</string>
     <key>LSUIElement</key>
@@ -35,6 +35,8 @@
     <key>SUPublicEDKey</key>
     <string>cYcjCtkaa77+ITn9yilFD2oMc8oDKXDcmsP0rYpeLzM=</string>
     <key>SUEnableAutomaticChecks</key>
+    <true/>
+    <key>SUAutomaticallyUpdate</key>
     <true/>
     <key>SUScheduledCheckInterval</key>
     <integer>86400</integer>
