@@ -38,6 +38,8 @@ struct NoteListView: View {
     let focusTracker: FocusTracker
     /// Shared with NoteListWindow so keyDown(with:) can read the selection.
     @ObservedObject var viewState: NoteListViewState
+    /// Drives the in-panel "Update available" banner.
+    @ObservedObject private var updateNotifier = UpdateNotifier.shared
     let onHide: () -> Void
 
     @State private var newNoteText: String = ""
@@ -72,6 +74,7 @@ struct NoteListView: View {
         GeometryReader { geo in
             VStack(spacing: 0) {
                 titleBar
+                updateBanner
                 Divider()
                 if geo.size.width >= Self.sidebarBreakpoint {
                     sidebarLayout
@@ -128,6 +131,48 @@ struct NoteListView: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
+    }
+
+    // MARK: - Update banner
+
+    @ViewBuilder
+    private var updateBanner: some View {
+        if let version = updateNotifier.availableVersion {
+            HStack(spacing: 8) {
+                Image(systemName: "arrow.down.circle.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(.white)
+                Text("MynahPad \(version) is available")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                Button(action: { updateNotifier.onInstallTapped?() }) {
+                    Text("Update Now")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            RoundedRectangle(cornerRadius: 4)
+                                .stroke(Color.white.opacity(0.7), lineWidth: 1)
+                        )
+                }
+                .buttonStyle(.plain)
+                Button(action: { updateNotifier.dismiss() }) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 10, weight: .semibold))
+                        .foregroundColor(.white.opacity(0.85))
+                        .padding(2)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help("Dismiss")
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 6)
+            .background(Color.accentColor.opacity(0.85))
+        }
     }
 
     // MARK: - Sidebar layout (wide)

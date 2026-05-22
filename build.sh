@@ -9,8 +9,32 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SRC="$PROJECT_DIR/MynahPad"
 DIST="$PROJECT_DIR/dist"
-APP="$DIST/MynahPad.app"
-BINARY_NAME="MynahPad"
+
+# Variant — release builds ship to users; dev builds are sibling installs with
+# their own bundle id, app name, and TCC accessibility entry so they coexist
+# cleanly with the production app installed in /Applications.
+RELEASE_BUILD=false
+DMG_BUILD=false
+for arg in "$@"; do
+  case "$arg" in
+    --release) RELEASE_BUILD=true ;;
+    --dmg) DMG_BUILD=true ;;
+  esac
+done
+
+if [[ "$RELEASE_BUILD" == "true" ]]; then
+  BINARY_NAME="MynahPad"
+  BUNDLE_NAME="MynahPad"
+  BUNDLE_IDENTIFIER="com.mynahpad.app"
+  APP_FOLDER_NAME="MynahPad.app"
+else
+  BINARY_NAME="MynahPad Dev"
+  BUNDLE_NAME="MynahPad Dev"
+  BUNDLE_IDENTIFIER="com.mynahpad.app.dev"
+  APP_FOLDER_NAME="MynahPad Dev.app"
+fi
+
+APP="$DIST/$APP_FOLDER_NAME"
 
 SPARKLE_VERSION="2.6.4"
 SPARKLE_DIR="$PROJECT_DIR/vendor/Sparkle"
@@ -41,16 +65,18 @@ SOURCES=(
   "$SRC/StatusBarController.swift"
   "$SRC/NoteListWindow.swift"
   "$SRC/NoteListView.swift"
+  "$SRC/UpdateNotifier.swift"
   "$SRC/MynahPadApp.swift"
 )
 
 # Build flags
 OPT_FLAGS="-Onone -g"
-if [[ "${1:-}" == "--release" ]] || [[ "${2:-}" == "--release" ]]; then
+if [[ "$RELEASE_BUILD" == "true" ]]; then
   OPT_FLAGS="-O -whole-module-optimization"
-  echo "→ Release build"
+  echo "→ Release build  (bundle id: $BUNDLE_IDENTIFIER, app: $APP_FOLDER_NAME)"
 else
-  echo "→ Debug build (pass --release for optimised build)"
+  echo "→ Dev build      (bundle id: $BUNDLE_IDENTIFIER, app: $APP_FOLDER_NAME)"
+  echo "                 (pass --release for the production-shaped optimised bundle)"
 fi
 
 echo "→ Compiling Swift sources..."
@@ -86,6 +112,19 @@ cp -R "$SPARKLE_FRAMEWORK" "$APP/Contents/Frameworks/Sparkle.framework"
 # Fix Info.plist: replace the Xcode build variable with the real executable name.
 sed "s/\$(EXECUTABLE_NAME)/$BINARY_NAME/g" \
   "$SRC/Info.plist" > "$APP/Contents/Info.plist"
+
+if [[ "$RELEASE_BUILD" != "true" ]]; then
+  # Dev variant: swap in the dev bundle id and display name so this bundle
+  # gets its own TCC Accessibility entry (won't collide with the production
+  # app's grant) and shows up as "MynahPad Dev" everywhere — menu bar, About
+  # panel, System Settings. Sparkle auto-checks are disabled too so a dev
+  # bundle never replaces itself with the prod release.
+  /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier $BUNDLE_IDENTIFIER" "$APP/Contents/Info.plist"
+  /usr/libexec/PlistBuddy -c "Set :CFBundleName $BUNDLE_NAME" "$APP/Contents/Info.plist"
+  /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName $BUNDLE_NAME" "$APP/Contents/Info.plist"
+  /usr/libexec/PlistBuddy -c "Set :SUEnableAutomaticChecks false" "$APP/Contents/Info.plist"
+  /usr/libexec/PlistBuddy -c "Set :SUAutomaticallyUpdate false" "$APP/Contents/Info.plist"
+fi
 
 # Copy PkgInfo (required by macOS app loader)
 printf "APPL????" > "$APP/Contents/PkgInfo"
@@ -292,9 +331,10 @@ echo "→ Designated requirement:"
 codesign -d -r- "$APP" 2>&1 | grep -i "designated" | sed 's/^/  /' || true
 
 # Optional: wrap in a DMG.
-if [[ "${1:-}" == "--dmg" ]] || [[ "${2:-}" == "--dmg" ]]; then
+if [[ "$DMG_BUILD" == "true" ]]; then
   VERSION=$(defaults read "$APP/Contents/Info" CFBundleShortVersionString 2>/dev/null || echo "0.0.0")
-  DMG="$DIST/MynahPad-${VERSION}.dmg"
+  DMG_BASE="${BUNDLE_NAME// /-}"
+  DMG="$DIST/${DMG_BASE}-${VERSION}.dmg"
   STAGE="$DIST/dmg-stage"
 
   echo "→ Staging DMG contents at $STAGE..."
@@ -302,14 +342,14 @@ if [[ "${1:-}" == "--dmg" ]] || [[ "${2:-}" == "--dmg" ]]; then
   mkdir -p "$STAGE"
   # Use ditto (preserves resource forks/xattrs/symlinks correctly) so the
   # signed bundle copies cleanly.
-  ditto "$APP" "$STAGE/MynahPad.app"
+  ditto "$APP" "$STAGE/$APP_FOLDER_NAME"
   # Drag-install hint: an /Applications symlink next to the app gives Finder
-  # the familiar "drag MynahPad onto Applications" layout when mounted.
+  # the familiar "drag onto Applications" layout when mounted.
   ln -s /Applications "$STAGE/Applications"
 
   echo "→ Creating $DMG..."
   rm -f "$DMG"
-  hdiutil create -volname "MynahPad ${VERSION}" \
+  hdiutil create -volname "$BUNDLE_NAME ${VERSION}" \
     -srcfolder "$STAGE" \
     -ov -format UDZO \
     "$DMG"

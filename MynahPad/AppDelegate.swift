@@ -44,6 +44,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             updater: updaterController
         )
 
+        // Wire the in-panel "Update Now" banner button to Sparkle so the user
+        // can re-open the native install dialog without using the menu bar.
+        UpdateNotifier.shared.onInstallTapped = { [weak self] in
+            self?.updaterController.checkForUpdates(nil)
+        }
+
+        // Show the panel on launch so the user sees their notes immediately
+        // instead of having to click the menu-bar icon first.
+        noteListWindow.showWindow()
+
         // Accessibility trust — required for the Cmd+V paste to actually fire.
         // Without it, CGEventPost silently no-ops. Prompt the user once on launch
         // so they can grant it in System Settings → Privacy & Security.
@@ -127,6 +137,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 // MARK: - SPUUpdaterDelegate
 
 extension AppDelegate: SPUUpdaterDelegate {
+    /// Fires when Sparkle confirms an appcast entry is newer than the running
+    /// build. Surface it in the panel banner and reveal the window so the user
+    /// can act even if they dismissed the native dialog.
+    func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
+        DispatchQueue.main.async {
+            UpdateNotifier.shared.setAvailable(version: item.displayVersionString)
+            self.noteListWindow.showWindow()
+        }
+    }
+
     /// Called on a background thread when Sparkle finishes downloading an update.
     /// Prompts the user to restart immediately rather than waiting for next launch.
     func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
