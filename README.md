@@ -46,3 +46,4 @@ the app, the new version installs automatically — no dialogs, no clicks.
 - **Build from source / contribute**: [CONTRIBUTING.md](CONTRIBUTING.md)
 - **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 - **License**: MIT
+- **Made by**: [gongideas.com](https://gongideas.com)
