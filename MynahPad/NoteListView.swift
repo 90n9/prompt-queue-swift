@@ -41,6 +41,7 @@ struct NoteListView: View {
     /// Drives the in-panel "Update available" banner.
     @ObservedObject private var updateNotifier = UpdateNotifier.shared
     let onHide: () -> Void
+    let onToggleMinimize: () -> Void
 
     @State private var newNoteText: String = ""
     @State private var newFolderName: String = ""
@@ -74,16 +75,18 @@ struct NoteListView: View {
         GeometryReader { geo in
             VStack(spacing: 0) {
                 titleBar
-                updateBanner
-                Divider()
-                if geo.size.width >= Self.sidebarBreakpoint {
-                    sidebarLayout
-                } else {
-                    stackedLayout
+                if !viewState.isMinimized {
+                    updateBanner
+                    Divider()
+                    if geo.size.width >= Self.sidebarBreakpoint {
+                        sidebarLayout
+                    } else {
+                        stackedLayout
+                    }
+                    Divider()
+                    inputBar
+                    shortcutHintBar
                 }
-                Divider()
-                inputBar
-                shortcutHintBar
             }
         }
         .foregroundColor(.primary)
@@ -122,12 +125,22 @@ struct NoteListView: View {
                 .font(.system(size: 11))
                 .foregroundColor(.secondary)
                 .lineLimit(1)
+            Button(action: onToggleMinimize) {
+                Image(systemName: viewState.isMinimized
+                      ? "arrow.up.left.and.arrow.down.right.circle.fill"
+                      : "minus.circle.fill")
+                    .foregroundColor(.secondary)
+                    .font(.system(size: 14))
+            }
+            .buttonStyle(.plain)
+            .help(viewState.isMinimized ? "Expand" : "Minimize")
             Button(action: onHide) {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundColor(.secondary)
                     .font(.system(size: 14))
             }
             .buttonStyle(.plain)
+            .help("Close")
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)

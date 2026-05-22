@@ -11,6 +11,9 @@ final class NoteListViewState: ObservableObject {
     /// Mirrors the visible folder so the window's keyDown can read it
     /// (for "Cmd+Delete clears used in current folder", etc.).
     @Published var selectedFolderID: String = "general"
+    /// When true, the window shrinks to the title-bar only so the panel
+    /// can stay floating without blocking content during screen sharing.
+    @Published var isMinimized: Bool = false
 }
 
 // MARK: - Window
@@ -26,6 +29,16 @@ final class NoteListWindow: NSWindow, NSWindowDelegate {
 
     /// Shared selection state — the SwiftUI view writes here; keyDown reads it.
     private let viewState = NoteListViewState()
+
+    /// Height the window had right before being minimized. Used to restore
+    /// the previous size when the user expands again.
+    private var savedExpandedHeight: CGFloat = 500
+
+    /// Title-bar-only height when minimized.
+    private let minimizedHeight: CGFloat = 36
+
+    /// Minimum expanded height. Mirrors the value set in `configureWindow()`.
+    private let expandedMinHeight: CGFloat = 350
 
     init(store: Store, focusTracker: FocusTracker) {
         self.store = store
@@ -152,9 +165,13 @@ final class NoteListWindow: NSWindow, NSWindowDelegate {
         blur.translatesAutoresizingMaskIntoConstraints = false
         cv.addSubview(blur)
 
-        let rootView = NoteListView(store: store, focusTracker: focusTracker, viewState: viewState) { [weak self] in
-            self?.hideWindow()
-        }
+        let rootView = NoteListView(
+            store: store,
+            focusTracker: focusTracker,
+            viewState: viewState,
+            onHide: { [weak self] in self?.hideWindow() },
+            onToggleMinimize: { [weak self] in self?.toggleMinimize() }
+        )
         let hosting = NSHostingView(rootView: rootView)
         hosting.translatesAutoresizingMaskIntoConstraints = false
         // Ensure the SwiftUI host doesn't paint a solid background that would
@@ -195,6 +212,49 @@ final class NoteListWindow: NSWindow, NSWindowDelegate {
         }
     }
 
+    // MARK: - Minimize / Expand
+
+    /// Collapse the window to a title-bar-only strip so it can stay floating
+    /// during screen sharing without covering content underneath.
+    func toggleMinimize() {
+        if viewState.isMinimized {
+            expandToFullHeight()
+        } else {
+            collapseToTitleBar()
+        }
+    }
+
+    private func collapseToTitleBar() {
+        savedExpandedHeight = frame.height
+        viewState.isMinimized = true
+
+        // Allow the window to be smaller than the normal minimum.
+        minSize = NSSize(width: minSize.width, height: minimizedHeight)
+        maxSize = NSSize(width: maxSize.width, height: minimizedHeight)
+
+        var newFrame = frame
+        let delta = frame.height - minimizedHeight
+        newFrame.size.height = minimizedHeight
+        // Keep the top edge anchored so the window doesn't appear to jump.
+        newFrame.origin.y += delta
+        setFrame(newFrame, display: true, animate: true)
+    }
+
+    private func expandToFullHeight() {
+        viewState.isMinimized = false
+
+        let target = max(savedExpandedHeight, expandedMinHeight)
+        // Restore the normal resize bounds.
+        minSize = NSSize(width: minSize.width, height: expandedMinHeight)
+        maxSize = NSSize(width: maxSize.width, height: 1200)
+
+        var newFrame = frame
+        let delta = target - frame.height
+        newFrame.size.height = target
+        newFrame.origin.y -= delta
+        setFrame(newFrame, display: true, animate: true)
+    }
+
     // MARK: - NSWindowDelegate
 
     func windowWillClose(_ notification: Notification) {
@@ -213,6 +273,10 @@ final class NoteListWindow: NSWindow, NSWindowDelegate {
     // MARK: - Geometry persistence
 
     private func saveGeometry() {
+        // Skip while minimized — the title-bar-only height isn't a height
+        // we want to restore on next launch. The pre-minimize height was
+        // already persisted by the previous resize.
+        if viewState.isMinimized { return }
         let f = frame
         store.windowGeometry = WindowGeometry(
             x: Int(f.origin.x),

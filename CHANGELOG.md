@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.11] - 2026-05-22
+
+### Added
+- Title-bar minimize button. Click the `−` between the folder name and the
+  close button to collapse the panel to a slim title-bar-only strip — the
+  panel keeps floating above other windows so you can expand it again with
+  one click, but it stops covering content underneath. Handy during screen
+  sharing or when you want to read what's behind the panel without losing
+  its position. The expand glyph swaps in while collapsed; clicking it
+  restores the previous height. The minimized height isn't persisted, so
+  next launch opens at the full size as before.
+
 ## [1.0.10] - 2026-05-22
 
 ### Fixed
