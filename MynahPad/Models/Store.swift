@@ -35,7 +35,12 @@ final class Store: ObservableObject {
 
     private static var storageURL: URL {
         let home = FileManager.default.homeDirectoryForCurrentUser
-        let base = home.appendingPathComponent(".config/mynahpad", isDirectory: true)
+        // Dev builds use a sibling directory so testing doesn't trample the
+        // user's production notes. Detection is bundle-id based: prod is
+        // `com.mynahpad.app`; dev is `com.mynahpad.app.dev` (see build.sh).
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.mynahpad.app"
+        let dirName = bundleID.hasSuffix(".dev") ? "mynahpad-dev" : "mynahpad"
+        let base = home.appendingPathComponent(".config/\(dirName)", isDirectory: true)
         try? FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
         let url = base.appendingPathComponent("notes.json")
 

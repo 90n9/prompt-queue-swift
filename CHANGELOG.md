@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-05-22
+
+### Added
+- The note panel now opens automatically on app launch instead of waiting for
+  the user to click the menu-bar icon — so the first thing you see after
+  starting MynahPad is your notes.
+- In-panel update banner. When Sparkle's background check finds a newer
+  version, an accent-colored banner appears at the top of the panel with
+  the new version number and an `Update Now` button that re-presents the
+  native install dialog (handy after dismissing the popup with "Later"). A
+  small `×` dismisses the banner without affecting Sparkle's state.
+
+### Changed
+- `build.sh` now produces a clearly-separated "MynahPad Dev" bundle by
+  default. The dev variant uses bundle id `com.mynahpad.app.dev`, app name
+  `MynahPad Dev`, and writes notes under `~/.config/mynahpad-dev/notes.json`,
+  so it never collides with the production app's TCC Accessibility grant or
+  data store. Pass `--release` to build the production-shaped bundle. Dev
+  bundles also have Sparkle auto-checks disabled so a local build never
+  silently swaps itself out for the production release.
+
 ## [1.0.8] - 2026-05-22
 
 ### Fixed
