@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-05-22
+
+### Fixed
+- Paste into terminal now survives Sparkle auto-updates. Each CI release
+  previously generated a fresh self-signed certificate, changing the app's
+  designated requirement on every build. macOS TCC interprets a changed
+  requirement as a different app and revokes the Accessibility grant, so
+  double-click would copy text to the clipboard but never send Cmd+V.
+  CI builds now import a stable certificate from a GitHub Actions secret
+  so the cert-leaf hash stays identical across all releases and the grant
+  persists through updates.
+
 ## [1.0.3] - 2026-05-22
 
 ### Changed
