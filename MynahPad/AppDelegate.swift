@@ -140,43 +140,17 @@ extension AppDelegate: SPUUpdaterDelegate {
     /// Fires when Sparkle confirms an appcast entry is newer than the running
     /// build. Surface it in the panel banner and reveal the window so the user
     /// can act even if they dismissed the native dialog.
+    ///
+    /// We deliberately do NOT hook `didDownloadUpdate` to show a "restart now"
+    /// alert: that callback fires before Sparkle has extracted/validated/staged
+    /// the update, so quitting at that point relaunches the *old* bundle.
+    /// Sparkle's own standard user driver already presents the correct
+    /// "Install Update and Relaunch" dialog once the package is fully staged
+    /// — we let it handle that step.
     func updater(_ updater: SPUUpdater, didFindValidUpdate item: SUAppcastItem) {
         DispatchQueue.main.async {
             UpdateNotifier.shared.setAvailable(version: item.displayVersionString)
             self.noteListWindow.showWindow()
         }
-    }
-
-    /// Called on a background thread when Sparkle finishes downloading an update.
-    /// Prompts the user to restart immediately rather than waiting for next launch.
-    func updater(_ updater: SPUUpdater, didDownloadUpdate item: SUAppcastItem) {
-        DispatchQueue.main.async {
-            self.promptRestart(version: item.displayVersionString)
-        }
-    }
-
-    private func promptRestart(version: String) {
-        NSApp.activate(ignoringOtherApps: true)
-        let alert = NSAlert()
-        alert.messageText = "MynahPad \(version) is ready to install"
-        alert.informativeText = "The update has been downloaded. Restart now to apply it."
-        alert.addButton(withTitle: "Restart Now")
-        alert.addButton(withTitle: "Later")
-        if alert.runModal() == .alertFirstButtonReturn {
-            relaunch()
-        }
-    }
-
-    /// Spawns an independent shell process that reopens the app after we quit,
-    /// giving Sparkle's installer time to swap in the new bundle.
-    private func relaunch() {
-        let path = Bundle.main.bundlePath
-            .replacingOccurrences(of: "\\", with: "\\\\")
-            .replacingOccurrences(of: "'", with: "'\\''")
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/bin/sh")
-        task.arguments = ["-c", "sleep 1 && open '\(path)'"]
-        try? task.run()
-        NSApp.terminate(nil)
     }
 }

@@ -151,9 +151,13 @@ jobs:
           ET.register_namespace("sparkle", SPARKLE_NS)
           ET.register_namespace("dc", DC_NS)
 
-          # Pull description from first changelog section.
+          # Pull description from the first VERSIONED changelog section. The
+          # leading `\d` skips the `[Unreleased]` placeholder so the appcast
+          # never ships an empty description when the maintainer left it blank
+          # above the real version heading. (Matches the GitHub Release body
+          # extractor above — they were diverging silently.)
           changelog = open("CHANGELOG.md").read()
-          m = re.search(r'(## \[.*?\].*?)(?=\n## \[|\Z)', changelog, re.DOTALL)
+          m = re.search(r'(## \[\d[^\]]*\].*?)(?=\n## \[|\Z)', changelog, re.DOTALL)
           description = m.group(1).strip() if m else f"MynahPad {VERSION}"
 
           tree = ET.parse("appcast.xml")

@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.10] - 2026-05-22
+
+### Fixed
+- "Restart now" no longer relaunches into the same version. The previous
+  build hooked Sparkle's `didDownloadUpdate` callback and immediately
+  prompted to restart, but at that point Sparkle has only finished
+  downloading — it hasn't yet extracted, validated, or staged the new
+  bundle. Quitting that early skipped the installer entirely and reopened
+  the running build. We now defer to Sparkle's standard user driver,
+  which shows its own "Install Update and Relaunch" prompt once the
+  package is actually staged — the popup that already worked correctly
+  when the user picked "Later" on the old prompt.
+- Sparkle release-notes pane in the update dialog now shows the actual
+  CHANGELOG entry instead of the empty `[Unreleased]` placeholder. The
+  workflow's appcast-description extractor was matching any `## [...]`
+  heading first, so an empty `[Unreleased]` section above the real
+  version heading clobbered the description. Tightened the regex to
+  require a digit (matching the GitHub Release body extractor that was
+  already doing it correctly).
+
 ## [1.0.9] - 2026-05-22
 
 ### Added
