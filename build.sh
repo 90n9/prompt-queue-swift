@@ -140,6 +140,13 @@ fi
 if [[ -f "$PROJECT_DIR/assets/mini-icon.png" ]]; then
   cp "$PROJECT_DIR/assets/mini-icon.png" "$APP/Contents/Resources/MiniIcon.png"
 fi
+# Tightly-bounded colourful icon used in the minimized title-bar strip.
+# Bypasses Icon.icns to avoid the standard macOS app-icon canvas padding,
+# which renders as a blank frame outside the Dock context.
+# Regenerate via scripts/trim-icon.py if app-icon.png changes.
+if [[ -f "$PROJECT_DIR/assets/app-icon-trimmed.png" ]]; then
+  cp "$PROJECT_DIR/assets/app-icon-trimmed.png" "$APP/Contents/Resources/AppIconColor.png"
+fi
 
 echo "→ Built: $APP"
 ls -lh "$APP/Contents/MacOS/$BINARY_NAME"

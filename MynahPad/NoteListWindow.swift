@@ -36,8 +36,9 @@ final class NoteListWindow: NSWindow, NSWindowDelegate {
     private var savedExpandedWidth: CGFloat = 320
 
     /// Strip dimensions when minimized — logo + minimize + close, nothing else.
-    private let minimizedHeight: CGFloat = 32
-    private let minimizedWidth: CGFloat = 92
+    /// Height is sized for the 42pt colourful app icon with 6pt vertical padding.
+    private let minimizedHeight: CGFloat = 54
+    private let minimizedWidth: CGFloat = 120
 
     /// Minimum expanded bounds. Mirror the values set in `configureWindow()`.
     private let expandedMinWidth: CGFloat = 280

@@ -62,9 +62,17 @@ struct NoteListView: View {
 
     /// Cached menu-bar icon. Same MiniIcon.png bundled at
     /// MynahPad.app/Contents/Resources/ that StatusBarController draws in the menu
-    /// bar, so the title-bar glyph matches the menu-bar glyph exactly.
+    /// bar, so the expanded title-bar glyph matches the menu-bar glyph exactly.
     private static let titleIcon: NSImage? = {
         guard let url = Bundle.main.url(forResource: "MiniIcon", withExtension: "png") else { return nil }
+        return NSImage(contentsOf: url)
+    }()
+
+    /// Colourful app icon with the dark squircle tile, loaded from the raw
+    /// trimmed PNG (not Icon.icns) so the standard macOS app-icon canvas
+    /// padding doesn't render as a blank frame around the artwork.
+    private static let appIcon: NSImage? = {
+        guard let url = Bundle.main.url(forResource: "AppIconColor", withExtension: "png") else { return nil }
         return NSImage(contentsOf: url)
     }()
 
@@ -108,7 +116,13 @@ struct NoteListView: View {
 
     private var titleBar: some View {
         HStack(spacing: 6) {
-            if let icon = Self.titleIcon {
+            if viewState.isMinimized, let icon = Self.appIcon {
+                Image(nsImage: icon)
+                    .resizable()
+                    .interpolation(.high)
+                    .aspectRatio(contentMode: .fit)
+                    .frame(width: 42, height: 42)
+            } else if let icon = Self.titleIcon {
                 Image(nsImage: icon)
                     .resizable()
                     .renderingMode(.template)
@@ -133,14 +147,14 @@ struct NoteListView: View {
             }
             Button(action: onToggleMinimize) {
                 Image(systemName: viewState.isMinimized ? "plus.circle.fill" : "minus.circle.fill")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color(red: 1.0, green: 0.74, blue: 0.18))
                     .font(.system(size: 14))
             }
             .buttonStyle(.plain)
             .help(viewState.isMinimized ? "Expand" : "Minimize")
             Button(action: onHide) {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color(red: 1.0, green: 0.37, blue: 0.34))
                     .font(.system(size: 14))
             }
             .buttonStyle(.plain)

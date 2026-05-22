@@ -154,7 +154,14 @@ final class StatusBarController: NSObject {
             ]
         )
 
-        NSApp.orderFrontStandardAboutPanel(options: [.credits: credits])
+        var options: [NSApplication.AboutPanelOptionKey: Any] = [.credits: credits]
+        // Override the default Icon.icns so the About panel shows the tightly-
+        // cropped artwork instead of the padded Dock-canvas version.
+        if let url = Bundle.main.url(forResource: "AppIconColor", withExtension: "png"),
+           let icon = NSImage(contentsOf: url) {
+            options[.applicationIcon] = icon
+        }
+        NSApp.orderFrontStandardAboutPanel(options: options)
     }
 
     @objc private func checkForUpdates(_ sender: Any?) {

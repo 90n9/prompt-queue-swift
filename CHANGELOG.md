@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.13] - 2026-05-22
+
+### Changed
+- Minimized strip now shows the full-colour MynahPad icon at 3× the
+  expanded-state size (42pt vs 14pt), making the floating pill far easier
+  to spot and click while screen-sharing. The artwork is loaded from a
+  trimmed source PNG that bypasses the standard macOS app-icon canvas
+  padding, so there's no blank frame around the squircle. The strip's
+  bounds grew to 54×120pt to fit the bigger icon with even padding.
+- Title-bar buttons adopt the familiar macOS traffic-light colours: the
+  minimize/expand button is yellow and the close button is red, replacing
+  the previous secondary-grey treatment.
+- The About panel now uses the same tight-cropped colourful icon as the
+  minimized strip, instead of the padded Dock-canvas version from
+  `Icon.icns`.
+
 ## [1.0.12] - 2026-05-22
 
 ### Changed
