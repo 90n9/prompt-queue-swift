@@ -72,7 +72,7 @@ final class StatusBarController: NSObject {
 
         // Version label (inert).
         let versionItem = NSMenuItem(
-            title: "MynahPad v\(Self.version)",
+            title: "MynahPad \(Self.version)",
             action: nil,
             keyEquivalent: ""
         )

@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-05-22
+
+### Fixed
+- Accessibility permission dialog no longer re-fires on every launch when the
+  grant is genuinely in place. The launch-time check now uses the side-effect-
+  free `AXIsProcessTrusted()` first; only if untrusted do we present our own
+  alert. The alert offers an `Open System Settings` action and a `Reset & Grant`
+  action that runs `tccutil reset Accessibility com.mynahpad.app` — useful when
+  a stale TCC grant from a different code signature is blocking paste.
+
+### Changed
+- Version strings now match between the status bar menu and Sparkle's
+  "Check for Updates…" dialog (both render `MynahPad 1.0.8`). `CFBundleVersion`
+  is kept in lockstep with `CFBundleShortVersionString` so Sparkle no longer
+  appends a `(build)` suffix.
+- Scheduled update check interval reduced from 24h to 1h while the app is
+  early-stage and shipping frequent fixes.
+
 ## [1.0.7] - 2026-05-22
 
 ### Fixed

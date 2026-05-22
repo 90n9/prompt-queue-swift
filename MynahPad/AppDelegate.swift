@@ -57,12 +57,61 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func promptForAccessibilityIfNeeded() {
-        let key = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
-        let opts = [key: true] as CFDictionary
-        let trusted = AXIsProcessTrustedWithOptions(opts)
-        if !trusted {
-            NSLog("[MynahPad] Accessibility not granted — paste will silently fail until granted.")
+        // Side-effect-free check first. If the grant is already there for this
+        // binary's signing identity, we never bother the user.
+        if AXIsProcessTrusted() {
+            NSLog("[MynahPad] Accessibility already granted.")
+            return
         }
+
+        NSLog("[MynahPad] Accessibility not granted — paste will silently fail until granted.")
+
+        // Defer to the next runloop tick so the alert doesn't race the status
+        // bar / window setup happening in applicationDidFinishLaunching.
+        DispatchQueue.main.async { [weak self] in
+            self?.showAccessibilityAlert()
+        }
+    }
+
+    private func showAccessibilityAlert() {
+        NSApp.activate(ignoringOtherApps: true)
+        let alert = NSAlert()
+        alert.messageText = "Accessibility access needed"
+        alert.informativeText = """
+            MynahPad needs Accessibility access to paste notes into the focused window. \
+            Without it, copy still works but auto-paste will silently fail.
+
+            If you previously granted permission but still see this dialog, an older \
+            build's grant is stale (different code signature). Use "Reset & Grant" to \
+            clear it, then re-grant when prompted.
+            """
+        alert.addButton(withTitle: "Open System Settings")
+        alert.addButton(withTitle: "Reset & Grant")
+        alert.addButton(withTitle: "Later")
+
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            openAccessibilitySettings()
+        case .alertSecondButtonReturn:
+            resetAccessibilityGrant()
+        default:
+            break
+        }
+    }
+
+    private func openAccessibilitySettings() {
+        let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+        NSWorkspace.shared.open(url)
+    }
+
+    private func resetAccessibilityGrant() {
+        let bundleID = Bundle.main.bundleIdentifier ?? "com.mynahpad.app"
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/tccutil")
+        task.arguments = ["reset", "Accessibility", bundleID]
+        try? task.run()
+        task.waitUntilExit()
+        openAccessibilitySettings()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
