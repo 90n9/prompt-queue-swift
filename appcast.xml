@@ -2,11 +2,38 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <item>
+            <title>MynahPad 1.0.10</title>
+            <sparkle:version>1.0.10</sparkle:version>
+            <sparkle:shortVersionString>1.0.10</sparkle:shortVersionString>
+            <pubDate>Fri, 22 May 2026 03:13:13 GMT</pubDate>
+            <description><![CDATA[## [1.0.10] - 2026-05-22
+
+### Fixed
+- "Restart now" no longer relaunches into the same version. The previous
+  build hooked Sparkle's `didDownloadUpdate` callback and immediately
+  prompted to restart, but at that point Sparkle has only finished
+  downloading — it hasn't yet extracted, validated, or staged the new
+  bundle. Quitting that early skipped the installer entirely and reopened
+  the running build. We now defer to Sparkle's standard user driver,
+  which shows its own "Install Update and Relaunch" prompt once the
+  package is actually staged — the popup that already worked correctly
+  when the user picked "Later" on the old prompt.
+- Sparkle release-notes pane in the update dialog now shows the actual
+  CHANGELOG entry instead of the empty `[Unreleased]` placeholder. The
+  workflow's appcast-description extractor was matching any `## [...]`
+  heading first, so an empty `[Unreleased]` section above the real
+  version heading clobbered the description. Tightened the regex to
+  require a digit (matching the GitHub Release body extractor that was
+  already doing it correctly).]]></description>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/90n9/mynah-pad/releases/download/v1.0.10/MynahPad-1.0.10.dmg" length="4169008" type="application/octet-stream" sparkle:edSignature="7Ay5YIQIgpIjLlHVnwGuSQxKnpf0nIC4/SoytFcXiE7MGVYRX7D9zYTskYyysfuLc+WevOBR18VeMDnuCCDJCg==" sparkle:version="1.0.10" sparkle:shortVersionString="1.0.10" />
+        </item>
+        <item>
             <title>MynahPad 1.0.9</title>
             <sparkle:version>1.0.9</sparkle:version>
             <sparkle:shortVersionString>1.0.9</sparkle:shortVersionString>
             <pubDate>Fri, 22 May 2026 03:00:03 GMT</pubDate>
-            <description><![CDATA[## [Unreleased]]]></description>
+            <description>## [Unreleased]</description>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/90n9/mynah-pad/releases/download/v1.0.9/MynahPad-1.0.9.dmg" length="4173934" type="application/octet-stream" sparkle:edSignature="bCflyNzspSOblkPQiTXblEnQPMNArWjGV7OVABTcitfKstQ9G41vRImcUuJgOMXpV6bSudCyJL033Q93WmRFDQ==" sparkle:version="1.0.9" sparkle:shortVersionString="1.0.9" />
         </item>
