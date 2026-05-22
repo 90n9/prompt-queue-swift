@@ -2,11 +2,30 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <item>
+            <title>MynahPad 1.0.11</title>
+            <sparkle:version>1.0.11</sparkle:version>
+            <sparkle:shortVersionString>1.0.11</sparkle:shortVersionString>
+            <pubDate>Fri, 22 May 2026 03:58:09 GMT</pubDate>
+            <description><![CDATA[## [1.0.11] - 2026-05-22
+
+### Added
+- Title-bar minimize button. Click the `−` between the folder name and the
+  close button to collapse the panel to a slim title-bar-only strip — the
+  panel keeps floating above other windows so you can expand it again with
+  one click, but it stops covering content underneath. Handy during screen
+  sharing or when you want to read what's behind the panel without losing
+  its position. The expand glyph swaps in while collapsed; clicking it
+  restores the previous height. The minimized height isn't persisted, so
+  next launch opens at the full size as before.]]></description>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/90n9/mynah-pad/releases/download/v1.0.11/MynahPad-1.0.11.dmg" length="4174763" type="application/octet-stream" sparkle:edSignature="ix9CkGubCE+ukf9GtB0Q9gz+cvo8Ix9Vu1SCRgIkB4reiF7wJVSFak5QHhLzs0gOG/hAK2zcuaI7SImucGYIBA==" sparkle:version="1.0.11" sparkle:shortVersionString="1.0.11" />
+        </item>
+        <item>
             <title>MynahPad 1.0.10</title>
             <sparkle:version>1.0.10</sparkle:version>
             <sparkle:shortVersionString>1.0.10</sparkle:shortVersionString>
             <pubDate>Fri, 22 May 2026 03:13:13 GMT</pubDate>
-            <description><![CDATA[## [1.0.10] - 2026-05-22
+            <description>## [1.0.10] - 2026-05-22
 
 ### Fixed
 - "Restart now" no longer relaunches into the same version. The previous
@@ -24,7 +43,7 @@
   heading first, so an empty `[Unreleased]` section above the real
   version heading clobbered the description. Tightened the regex to
   require a digit (matching the GitHub Release body extractor that was
-  already doing it correctly).]]></description>
+  already doing it correctly).</description>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/90n9/mynah-pad/releases/download/v1.0.10/MynahPad-1.0.10.dmg" length="4169008" type="application/octet-stream" sparkle:edSignature="7Ay5YIQIgpIjLlHVnwGuSQxKnpf0nIC4/SoytFcXiE7MGVYRX7D9zYTskYyysfuLc+WevOBR18VeMDnuCCDJCg==" sparkle:version="1.0.10" sparkle:shortVersionString="1.0.10" />
         </item>
