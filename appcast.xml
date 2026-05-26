@@ -2,11 +2,25 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <item>
+            <title>MynahPad 1.0.16</title>
+            <sparkle:version>1.0.16</sparkle:version>
+            <sparkle:shortVersionString>1.0.16</sparkle:shortVersionString>
+            <pubDate>Tue, 26 May 2026 08:33:46 GMT</pubDate>
+            <description><![CDATA[## [1.0.16] - 2026-05-26
+
+### Added
+- Double-clicking anywhere in the title bar now toggles minimize/expand,
+  matching the standard macOS convention. Single-clicking the dedicated
+  minimize/close buttons still works as before.]]></description>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/90n9/mynah-pad/releases/download/v1.0.16/MynahPad-1.0.16.dmg" length="5913067" type="application/octet-stream" sparkle:edSignature="/OVsEajAunwfaPmmPfVJVfYmJZsyph9O2jUPv2xy0npG1A5hQ3bEMqvEpnvf2xWSCr2z5bjqr0hZsaMJW6kqCQ==" sparkle:version="1.0.16" sparkle:shortVersionString="1.0.16" />
+        </item>
+        <item>
             <title>MynahPad 1.0.15</title>
             <sparkle:version>1.0.15</sparkle:version>
             <sparkle:shortVersionString>1.0.15</sparkle:shortVersionString>
             <pubDate>Fri, 22 May 2026 06:49:33 GMT</pubDate>
-            <description><![CDATA[## [1.0.15] - 2026-05-22
+            <description>## [1.0.15] - 2026-05-22
 
 ### Fixed
 - Edit-note sheet was showing an empty text editor the first time it was
@@ -17,7 +31,7 @@
   selected, because the double-click-to-paste handler forced SwiftUI to
   wait through its tap-disambiguation window. Selection now fires
   immediately on tap; double-click-to-paste runs as a simultaneous
-  gesture in parallel.]]></description>
+  gesture in parallel.</description>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/90n9/mynah-pad/releases/download/v1.0.15/MynahPad-1.0.15.dmg" length="5910242" type="application/octet-stream" sparkle:edSignature="gNDZSREm+iJ/QyY7KHmyoC5AOh0hdfmyeFEgh7XAp/iFbVEE4wyQpZpDL4WxdQCnRTdo3XvpxLhY4eQ/9YG8BA==" sparkle:version="1.0.15" sparkle:shortVersionString="1.0.15" />
         </item>
