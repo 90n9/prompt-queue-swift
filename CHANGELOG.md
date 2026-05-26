@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.16] - 2026-05-26
+
+### Added
+- Double-clicking anywhere in the title bar now toggles minimize/expand,
+  matching the standard macOS convention. Single-clicking the dedicated
+  minimize/close buttons still works as before.
+
 ## [1.0.15] - 2026-05-22
 
 ### Fixed

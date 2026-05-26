@@ -183,6 +183,8 @@ struct NoteListView: View {
         }
         .padding(.horizontal, viewState.isMinimized ? 10 : 14)
         .padding(.vertical, viewState.isMinimized ? 6 : 10)
+        .contentShape(Rectangle())
+        .onTapGesture(count: 2, perform: onToggleMinimize)
         .animation(.easeInOut(duration: 0.22), value: viewState.isMinimized)
     }
 
