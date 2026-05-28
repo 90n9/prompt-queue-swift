@@ -2,16 +2,40 @@
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <item>
-            <title>MynahPad 1.0.16</title>
-            <sparkle:version>1.0.16</sparkle:version>
-            <sparkle:shortVersionString>1.0.16</sparkle:shortVersionString>
-            <pubDate>Tue, 26 May 2026 08:33:46 GMT</pubDate>
-            <description><![CDATA[## [1.0.16] - 2026-05-26
+            <title>MynahPad 1.0.17</title>
+            <sparkle:version>1.0.17</sparkle:version>
+            <sparkle:shortVersionString>1.0.17</sparkle:shortVersionString>
+            <pubDate>Thu, 28 May 2026 13:39:05 GMT</pubDate>
+            <description><![CDATA[## [1.0.17] - 2026-05-28
+
+### Added
+- Selecting a note now expands the row to show its full text wrapped over
+  multiple lines instead of the 60-char single-line preview. Unselected
+  rows stay truncated so the list remains scannable.
+- The "New idea…" input is now multi-line: pasting long or multi-line text
+  preserves the full content (previously the single-line field silently
+  dropped everything after the first newline). The field auto-grows up to
+  four visible lines and wraps as you type. Submit with **⌘⏎** (Return
+  now inserts a newline).
 
 ### Added
 - Double-clicking anywhere in the title bar now toggles minimize/expand,
   matching the standard macOS convention. Single-clicking the dedicated
   minimize/close buttons still works as before.]]></description>
+            <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
+            <enclosure url="https://github.com/90n9/mynah-pad/releases/download/v1.0.17/MynahPad-1.0.17.dmg" length="5922705" type="application/octet-stream" sparkle:edSignature="cVL1bf6YVtr9cDjAFrkt/24mLlV9AXDkUHEqohc9ej/c6G8R4Kn1IRIiyae7ieLdDeiP1z2rjBM9Deh4aRf6CA==" sparkle:version="1.0.17" sparkle:shortVersionString="1.0.17" />
+        </item>
+        <item>
+            <title>MynahPad 1.0.16</title>
+            <sparkle:version>1.0.16</sparkle:version>
+            <sparkle:shortVersionString>1.0.16</sparkle:shortVersionString>
+            <pubDate>Tue, 26 May 2026 08:33:46 GMT</pubDate>
+            <description>## [1.0.16] - 2026-05-26
+
+### Added
+- Double-clicking anywhere in the title bar now toggles minimize/expand,
+  matching the standard macOS convention. Single-clicking the dedicated
+  minimize/close buttons still works as before.</description>
             <sparkle:minimumSystemVersion>13.0</sparkle:minimumSystemVersion>
             <enclosure url="https://github.com/90n9/mynah-pad/releases/download/v1.0.16/MynahPad-1.0.16.dmg" length="5913067" type="application/octet-stream" sparkle:edSignature="/OVsEajAunwfaPmmPfVJVfYmJZsyph9O2jUPv2xy0npG1A5hQ3bEMqvEpnvf2xWSCr2z5bjqr0hZsaMJW6kqCQ==" sparkle:version="1.0.16" sparkle:shortVersionString="1.0.16" />
         </item>
